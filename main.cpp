@@ -9,13 +9,11 @@
 
 using namespace std;
 
-// Узел для собственной очереди (из ЛР №3)
 struct UzelOcheredi {
     int versh;
     struct UzelOcheredi* sled;
 };
 
-// Собственная очередь на базе односвязного списка (Задание 2*)
 struct SvoyaOchered {
     struct UzelOcheredi* golova;
     struct UzelOcheredi* hvost;
@@ -30,7 +28,6 @@ int och_pusta(struct SvoyaOchered* q) {
     return q->golova == NULL;
 }
 
-// Добавление в конец очереди за O(1)
 void och_push(struct SvoyaOchered* q, int v) {
     struct UzelOcheredi* nov = (struct UzelOcheredi*)malloc(sizeof(struct UzelOcheredi));
     nov->versh = v;
@@ -44,7 +41,6 @@ void och_push(struct SvoyaOchered* q, int v) {
     }
 }
 
-// Извлечение из начала очереди за O(1)
 int och_pop(struct SvoyaOchered* q) {
     if (q->golova == NULL) return -1;
     struct UzelOcheredi* tmp = q->golova;
@@ -63,13 +59,11 @@ void och_ochist(struct SvoyaOchered* q) {
     }
 }
 
-// Узел для списков смежности графа
 struct UzelSpiska {
     int versh;
     struct UzelSpiska* sled;
 };
 
-// Генерация матрицы смежности неориентированного графа без петель
 int** sozd_matr(int n, int ver) {
     int** G = (int**)malloc(n * sizeof(int*));
     for (int i = 0; i < n; i++) {
@@ -105,7 +99,6 @@ void vivod_matr(int** G, int n) {
     }
 }
 
-// Преобразование матрицы смежности в списки смежности
 struct UzelSpiska** sozd_spiski(int** G, int n) {
     struct UzelSpiska** spiski = (struct UzelSpiska**)malloc(n * sizeof(struct UzelSpiska*));
     for (int i = 0; i < n; i++) {
@@ -156,7 +149,6 @@ void vivod_spiskov(struct UzelSpiska** spiski, int n) {
     }
 }
 
-// 1. Обход в ширину по матрице смежности с std::queue (Задание 1)
 void bfs_matr_std(int** G, int n, int start, int* pos, int pokaz) {
     queue<int> Q;
     Q.push(start);
@@ -176,7 +168,6 @@ void bfs_matr_std(int** G, int n, int start, int* pos, int pokaz) {
     }
 }
 
-// 2. Обход в ширину по спискам смежности с std::queue (Задание 1, п. 3*)
 void bfs_spis_std(struct UzelSpiska** spiski, int start, int* pos, int pokaz) {
     queue<int> Q;
     Q.push(start);
@@ -199,7 +190,6 @@ void bfs_spis_std(struct UzelSpiska** spiski, int start, int* pos, int pokaz) {
     }
 }
 
-// 3. Обход в ширину по матрице со своей очередью (Задание 2*)
 void bfs_matr_svoya(int** G, int n, int start, int* pos, int pokaz) {
     struct SvoyaOchered Q;
     och_init(&Q);
@@ -221,7 +211,6 @@ void bfs_matr_svoya(int** G, int n, int start, int* pos, int pokaz) {
     och_ochist(&Q);
 }
 
-// 4. Обход в ширину по спискам смежности со своей очередью (Задание 2*)
 void bfs_spis_svoya(struct UzelSpiska** spiski, int start, int* pos, int pokaz) {
     struct SvoyaOchered Q;
     och_init(&Q);
@@ -246,13 +235,11 @@ void bfs_spis_svoya(struct UzelSpiska** spiski, int start, int* pos, int pokaz) 
     och_ochist(&Q);
 }
 
-// Замер времени в миллисекундах
 double vremya_ms() {
     auto t = chrono::high_resolution_clock::now();
     return chrono::duration<double, milli>(t.time_since_epoch()).count();
 }
 
-// Процедура ПОШ (обход всех компонент связности) и замер времени
 double zapusk_posh(int tip, int n, int** G, struct UzelSpiska** spiski, int start, int pokaz) {
     int* pos = (int*)calloc(n, sizeof(int));
 
@@ -260,7 +247,6 @@ double zapusk_posh(int tip, int n, int** G, struct UzelSpiska** spiski, int star
 
     double t1 = vremya_ms();
 
-    // Сначала запускаем обход из выбранной стартовой вершины
     if (!pos[start]) {
         if (tip == 1) bfs_matr_std(G, n, start, pos, pokaz);
         else if (tip == 2) bfs_spis_std(spiski, start, pos, pokaz);
@@ -268,7 +254,6 @@ double zapusk_posh(int tip, int n, int** G, struct UzelSpiska** spiski, int star
         else if (tip == 4) bfs_spis_svoya(spiski, start, pos, pokaz);
     }
 
-    // Если граф несвязный, допроходим оставшиеся компоненты связности
     for (int i = 0; i < n; i++) {
         if (!pos[i]) {
             if (tip == 1) bfs_matr_std(G, n, i, pos, pokaz);
@@ -288,7 +273,6 @@ double zapusk_posh(int tip, int n, int** G, struct UzelSpiska** spiski, int star
     return t2 - t1;
 }
 
-// Сравнение времени работы на графах разных порядков (Задание 2*)
 void sravnenie_vremeni() {
     int ver = 30;
     printf("Введите вероятность ребра для теста (1-100%%): ");
@@ -359,7 +343,6 @@ int main() {
             printf("Введите количество вершин и вероятность ребра (%%): ");
             scanf("%d %d", &nov_n, &nov_ver);
 
-            // Сначала освобождаем память со старым размером n!
             ochist_matr(G, n);
             ochist_spiski(spiski, n);
 
